@@ -5,8 +5,6 @@
   <meta charset="utf-8" />
   <title>Formulario Corrección de datos reagendamiento entregas Sim Card</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Estilo mínimo, corporativo, sin alterar la estructura textual original -->
   <style>
     :root { --claro-red:#E60000; --claro-dark:#333; --bg:#f7f7f7; }
     *{box-sizing:border-box}
@@ -27,6 +25,7 @@
     .radicado{margin-top:12px;background:#f0fff0;border:1px solid #b6e3b6;padding:12px;border-radius:8px;display:none}
     pre{background:#fafafa;padding:12px;border:1px solid #eee;border-radius:8px}
     @media (max-width:760px){.grid{grid-template-columns:1fr}}
+    #hidden_iframe { width:0;height:0;border:0;position:absolute;left:-9999px; }
   </style>
 </head>
 <body>
@@ -37,58 +36,49 @@
   <main>
     <h3>Formulario Corrección datos reagendamiento entregas Sim Card</h3>
 
-    <!-- Formulario funcional: respeta nombres y reglas del ejemplo -->
     <form id="formSim" novalidate>
       <div class="grid">
-        <!-- Número a portar -->
         <div>
           <label for="numeroPortar">Número a portar</label>
           <input id="numeroPortar" name="numeroPortar" inputmode="numeric" pattern="^\d{10}$" maxlength="10" required />
           <small>El Número a portar debe ser numérico y tener exactamente 10 dígitos.</small>
         </div>
 
-        <!-- Cédula -->
         <div>
           <label for="cedula">Cédula</label>
           <input id="cedula" name="cedula" inputmode="numeric" pattern="^\d+$" required />
           <small>La cédula debe contener únicamente números.</small>
         </div>
 
-        <!-- Nombre Completo -->
         <div class="full">
           <label for="nombreCompleto">Nombre Completo</label>
           <input id="nombreCompleto" name="nombreCompleto" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
           <small>El nombre debe contener solo letras y espacios.</small>
         </div>
 
-        <!-- Dirección Completa -->
         <div class="full">
           <label for="direccionCompleta">Dirección Completa</label>
           <input id="direccionCompleta" name="direccionCompleta" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#\\-\\./\\/ ]+$" required />
           <small>Incluye complementos: apartamento, torre, bloque, piso, etc. La dirección debe ser alfanumérica y puede incluir #, -, ., /.</small>
         </div>
 
-        <!-- Barrio -->
         <div>
           <label for="barrio">Barrio</label>
           <input id="barrio" name="barrio" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$" required />
           <small>El barrio debe ser alfanumérico (letras y números).</small>
         </div>
 
-        <!-- Ciudad -->
         <div>
           <label for="ciudad">Ciudad</label>
           <input id="ciudad" name="ciudad" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
         </div>
 
-        <!-- Departamento -->
         <div>
           <label for="departamento">Departamento</label>
           <input id="departamento" name="departamento" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
           <small>El departamento debe contener solo letras y espacios.</small>
         </div>
 
-        <!-- Ventana de Cambio -->
         <div>
           <label for="ventanaCambio">Ventana de Cambio (dd/mm/aaaa)</label>
           <input id="ventanaCambio" name="ventanaCambio" placeholder="dd/mm/aaaa"
@@ -96,38 +86,32 @@
           <small>Formato de fecha inválido. Usa dd/mm/aaaa.</small>
         </div>
 
-        <!-- ICCID -->
         <div>
           <label for="iccid">ICCID (20 dígitos y debe iniciar con 8957101)</label>
           <input id="iccid" name="iccid" inputmode="numeric" pattern="^8957101\\d{13}$" maxlength="20" required />
           <small>El ICCID debe ser numérico, iniciar con 8957101 y tener 20 dígitos.</small>
         </div>
 
-        <!-- # DE CONTACTO -->
         <div>
           <label for="contacto"># DE CONTACTO</label>
           <input id="contacto" name="contacto" inputmode="numeric" pattern="^\\d{10}$" maxlength="10" required />
           <small>Debe ser un número distinto al Número a portar.</small>
         </div>
 
-        <!-- Observaciones -->
         <div class="full">
           <label for="observaciones">Observaciones</label>
           <textarea id="observaciones" name="observaciones" placeholder="Comentarios opcionales"></textarea>
         </div>
       </div>
 
-      <!-- Botones principales -->
       <div class="actions">
         <button type="submit">Guardar y Enviar</button>
         <button type="reset" class="secondary">Cancelar</button>
       </div>
 
-      <!-- Estado y radicado -->
       <div id="status" class="status" aria-live="polite"></div>
       <div id="radBox" class="radicado"><span id="radTxt"></span></div>
 
-      <!-- Bloque “Ver Descargas” y Consulta de Caso (como el ejemplo) -->
       <div style="margin-top:16px"><strong>Ver Descargas</strong></div>
 
       <h4>Consulta de Caso</h4>
@@ -147,43 +131,31 @@
 
       <pre id="resultadoConsulta"></pre>
     </form>
+
+    <!-- Plan B: iframe oculto para POST clásico sin CORS -->
+    <iframe id="hidden_iframe" name="hidden_iframe"></iframe>
+    <form id="fallbackForm" action="" method="POST" target="hidden_iframe" style="display:none">
+      <input type="hidden" name="json" id="fallbackJson">
+    </form>
   </main>
 
   <script>
-    /* === Integración con tu Google Sheets (Apps Script Web App) === */
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrH00LGUnIDglUf71xbhS9aewygODAmR_bLos5xpSKKHMweC3FparniO6-8KkvzBbGAg/exec';
+    // ✅ Tu nueva URL /exec (Apps Script Web App)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';
+
     // (Opcional) ID del Google Sheet para exportar a XLSX. Si no lo tienes, deja vacío.
-    const SHEET_ID = ''; // Ej.: '1AbCDEF...xyz'
+    const SHEET_ID   = ''; // Ej.: '1AbCDEF...xyz'
 
     const form     = document.getElementById('formSim');
     const statusEl = document.getElementById('status');
     const radBox   = document.getElementById('radBox');
     const radTxt   = document.getElementById('radTxt');
+    const resultado= document.getElementById('resultadoConsulta');
 
-    // Envío del formulario (respeta nombres y reglas)
-    form.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      statusEl.textContent = '';
-      radBox.style.display = 'none';
-      radTxt.textContent = '';
-
-      // Validaciones nativas HTML5
-      if (!form.reportValidity()) {
-        statusEl.textContent = 'Por favor corrige los campos marcados.';
-        return;
-      }
-
-      // Validación adicional: contacto ≠ número a portar
+    function buildPayload() {
       const numeroPortar = document.getElementById('numeroPortar').value.trim();
       const contacto     = document.getElementById('contacto').value.trim();
-      if (numeroPortar === contacto) {
-        statusEl.textContent = 'El # de contacto debe ser distinto al Número a portar.';
-        document.getElementById('contacto').focus();
-        return;
-      }
-
-      // Payload con nombres exactos del ejemplo
-      const payload = {
+      return {
         numeroPortar,
         cedula: document.getElementById('cedula').value.trim(),
         nombreCompleto: document.getElementById('nombreCompleto').value.trim(),
@@ -196,21 +168,51 @@
         contacto,
         observaciones: document.getElementById('observaciones').value.trim()
       };
+    }
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      statusEl.textContent = '';
+      radBox.style.display = 'none';
+      radTxt.textContent = '';
+
+      if (!form.reportValidity()) {
+        statusEl.textContent = 'Por favor corrige los campos marcados.';
+        return;
+      }
+
+      const p = buildPayload();
+      if (p.numeroPortar === p.contacto) {
+        statusEl.textContent = 'El # de contacto debe ser distinto al Número a portar.';
+        document.getElementById('contacto').focus();
+        return;
+      }
 
       try {
         statusEl.textContent = 'Enviando…';
 
-        // Patrón de fetch común para Apps Script (evita preflight CORS en la mayoría de casos)
         const resp = await fetch(SCRIPT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight en la mayoría de casos
           redirect: 'follow',
-          body: JSON.stringify(payload)
+          body: JSON.stringify(p)
         });
 
-        const txt = await resp.text();
+        const bodyText = await resp.text();
+        console.log('[Apps Script resp]', resp.status, bodyText);
+
+        if (!resp.ok) {
+          statusEl.textContent = `❌ Error HTTP ${resp.status}.`;
+          alert('No se pudo enviar el registro (HTTP ' + resp.status + ').');
+          return;
+        }
+
         let j = {};
-        try { j = JSON.parse(txt); } catch {}
+        try { j = JSON.parse(bodyText); } catch (e) {
+          statusEl.textContent = '❌ Respuesta no válida del servidor.';
+          alert('No se pudo enviar el registro: respuesta no válida.');
+          return;
+        }
 
         if (j.ok) {
           statusEl.textContent = '✅ Guardado correctamente.';
@@ -220,7 +222,42 @@
           }
           form.reset();
         } else {
-          statusEl.textContent = '❌ Error al guardar: ' + (j.error || 'Desconocido');
+          statusEl.textContent = '❌ Error del servidor: ' + (j.error || 'desconocido');
+          alert('No se pudo enviar el registro: ' + (j.error || 'Error desconocido.'));
         }
       } catch (error) {
-        console.error(error);
+        console.error('[fetch error]', error);
+        // ▶ PLAN B: envío clásico por <form> hacia el Web App (evita CORS)
+        statusEl.textContent = 'Intentando envío alternativo…';
+        const fb = document.getElementById('fallbackForm');
+        const fbJson = document.getElementById('fallbackJson');
+        fb.action = SCRIPT_URL;
+        fbJson.value = JSON.stringify(p); // doPost lee desde e.postData.contents o e.parameter.json
+        fb.submit();
+        alert('Se intentó un envío alternativo. Verifica la hoja en unos segundos.');
+      }
+    });
+
+    document.getElementById('btnConsultar').addEventListener('click', async () => {
+      const n = document.getElementById('consultaNumero').value.trim();
+      if (!/^\d{10}$/.test(n)) { resultado.textContent = 'Ingresa un número a portar válido (10 dígitos).'; return; }
+      resultado.textContent = 'Consultando…';
+      try {
+        const r = await fetch(`${SCRIPT_URL}?numero=${encodeURIComponent(n)}`);
+        const t = await r.text();
+        console.log('[GET resp]', r.status, t);
+        const j = JSON.parse(t);
+        resultado.textContent = j.ok ? JSON.stringify(j.data || j, null, 2) : ('No encontrado: ' + (j.error || ''));
+      } catch {
+        resultado.textContent = 'Error consultando el caso.';
+      }
+    });
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      if (!SHEET_ID) { alert('Configura el SHEET_ID en el código para habilitar la exportación.'); return; }
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+      window.open(url, '_blank');
+    });
+  </script>
+</body>
+</html>
