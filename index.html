@@ -5,8 +5,8 @@
   // 👉 Tu Web App (URL /exec de la nueva implementación)
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';
 
-  // (Opcional) ID de tu Google Sheet para exportar a XLSX
-  // Si todavía no lo tienes, deja vacío (no afecta al envío).
+  // (Opcional) ID de tu Google Sheet para exportar a XLSX.
+  // Si no lo conoces aún, deja vacío; el envío funciona igual.
   const SHEET_ID = ''; // Ej.: '1AbCDEF...xyz'
 
   /* ========== UTILIDADES ========== */
@@ -21,7 +21,7 @@
           const el = formEl.querySelector('#' + CSS.escape(forId));
           if (el) return el;
         }
-        // Si no hay "for", intenta el siguiente control
+        // Si no hay "for", toma el control que esté justo después
         const next = label.nextElementSibling;
         if (next && next.matches('input, textarea, select')) return next;
         if (next) {
@@ -37,7 +37,7 @@
   function normalizeKey(text) {
     return text
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
-      .toLowerCase().replace(/[^a-z0-9]+/g, '_')        // espacios -> _
+      .toLowerCase().replace(/[^a-z0-9]+/g, '_')        // espacios → _
       .replace(/^_+|_+$/g, '');
   }
 
@@ -51,7 +51,7 @@
       labelsObj[L] = val;
       dataObj[normalizeKey(L)] = val;
     }
-    // Observaciones u otros campos con name (si no tienen label)
+    // Campos con atributo name que no tengan <label> (por si los tienes)
     formEl.querySelectorAll('input[name], textarea[name], select[name]').forEach(el => {
       const n = el.getAttribute('name');
       if (n && !(n in labelsObj)) labelsObj[n] = String(el.value || '').trim();
@@ -59,7 +59,7 @@
     return { labels: labelsObj, data: dataObj };
   }
 
-  // Validaciones según tus reglas
+  // ✅ Validaciones según tus reglas
   function validarCampos(formEl) {
     const get = (t) => (getFieldByLabel(formEl, t) || { value: '' }).value.trim();
 
@@ -74,7 +74,7 @@
     const iccid        = get('ICCID (20 dígitos y debe iniciar con 8957101)');
     const contacto     = get('# DE CONTACTO');
 
-    // Número a portar: 10 dígitos, numérico
+    // Número a portar: 10 dígitos y numérico
     if (!/^\d{10}$/.test(numeroPortar)) {
       alert('Número a portar inválido: debe ser numérico y de 10 dígitos.');
       (getFieldByLabel(formEl, 'Número a portar') || {}).focus?.();
@@ -141,21 +141,21 @@
     return true;
   }
 
-  /* ========== ENVÍO PRINCIPAL ========== */
-  const form = document.querySelector('form'); // toma el primer formulario de la página
+  /* ========== ENVÍO (sin tocar tu diseño) ========== */
+  const form = document.querySelector('form'); // primer formulario de la página
   if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // 1) Valida según tus reglas y las nativas del navegador
+    // Validaciones del navegador + tus reglas
     if (form.checkValidity && !form.checkValidity()) {
       form.reportValidity && form.reportValidity();
       return;
     }
     if (!validarCampos(form)) return;
 
-    // 2) Arma el payload con TUS rótulos (labels) —preserva parámetros originales
+    // Campos tal cual tus rótulos (PARÁMETROS originales)
     const CAMPOS = [
       'Número a portar',
       'Cédula',
@@ -171,11 +171,10 @@
     ];
     const payload = collectPayload(form, CAMPOS);
 
-    // 3) Envía al Web App
     try {
       const resp = await fetch(SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight
         redirect: 'follow',
         body: JSON.stringify(payload)
       });
@@ -194,8 +193,7 @@
     }
   });
 
-  /* ========== BOTÓN “Consultar” (si existe) ========== */
-  // Busca un input de consulta y un botón con texto “Consultar”
+  /* ========== BOTÓN “Consultar” (si estás usando uno) ========== */
   const btnConsultar = Array.from(document.querySelectorAll('button'))
     .find(b => (b.textContent || '').trim().toLowerCase() === 'consultar');
   const campoConsulta =
@@ -219,7 +217,7 @@
     });
   }
 
-  /* ========== BOTÓN “Exportar XLSX” (si existe y hay SHEET_ID) ========== */
+  /* ========== BOTÓN “Exportar XLSX” (si existe y configuras SHEET_ID) ========== */
   const btnExport = Array.from(document.querySelectorAll('button'))
     .find(b => (b.textContent || '').trim().toLowerCase().includes('exportar xlsx'));
   if (btnExport) {
