@@ -172,7 +172,7 @@ try {
     console.error(err);
 }
 
-  document.getElementById('correccionForm').reset();
+  document.getElementById('miFormulario').reset();
 }
 
 function pedirCredenciales(){
@@ -238,7 +238,7 @@ function consultarCaso(){
 <!-- Integración con Google Apps Script (Web App) -->
 <script>
   // 1) Pega aquí TU URL del Web App (la que mostró {"status":"ok","msg":"Web App activo"})
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxa_8ypenVRr-TPfuDyXPhyMjbQyIxbDj6Scn7UGEmrmcohMkVKGGvdcLOyy2hbE63y3g/exec';  // ← usa la tuya completa
+  const ENDPOINT = '';  // ← usa la tuya completa
 
   // 2) Conecta el envío del formulario
   const form = document.getElementById('miFormulario');
