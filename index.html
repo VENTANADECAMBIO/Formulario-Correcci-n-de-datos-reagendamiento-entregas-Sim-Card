@@ -170,7 +170,7 @@ formData.append('contacto', document.getElementById('contacto').value);
 formData.append('observaciones', document.getElementById('observaciones').value);
 formData.append('asesor', document.getElementById('asesor').value);
 
-fetch('https://script.google.com/macros/s/AKfycb.../exec', {
+fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', {
   method: 'POST',
   body: formData
 })
@@ -494,10 +494,10 @@ document.getElementById('miFormulario').addEventListener('submit', function(e) {
     asesor: document.getElementById('asesor').value
   };
 
-  fetch('TU_URL_DE_APPS_SCRIPT', { // Reemplaza con tu URL de Google Apps Script
+  fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', { //
     method: 'POST',
     mode: 'cors',
-    headers: {
+    headers: { Reemplaza con tu URL de Google Apps Script
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
