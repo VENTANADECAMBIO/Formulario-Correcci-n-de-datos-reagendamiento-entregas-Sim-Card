@@ -1,0 +1,50 @@
+
+// URL del Web App de Apps Script (pega la tuya aquí)
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx7kGi2Futk0hxXU6aRFINaWiyUscvRKr_D0ll2pqfjtRz6-riQt5C4Bhzd9EJDWgNF8A/exec';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Asegúrate de que tu formulario tenga id="miFormulario"
+  const form = document.getElementById('miFormulario');
+  if (!form) {
+    console.warn('No se encontró el formulario con id="miFormulario". Revisa tu index.html');
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Captura de campos por ID: ajusta si algún id es diferente en tu HTML
+    const data = {
+      numeroPortacion: document.getElementById('numeroPortacion')?.value?.trim() || '',
+      cedula:          document.getElementById('cedula')?.value?.trim() || '',
+      nombre:          document.getElementById('nombre')?.value?.trim() || '',
+      direccion:       document.getElementById('direccion')?.value?.trim() || '',
+      barrio:          document.getElementById('barrio')?.value?.trim() || '',
+      ciudad:          document.getElementById('ciudad')?.value?.trim() || '',
+      departamento:    document.getElementById('departamento')?.value?.trim() || '',
+      ventanaCambio:   document.getElementById('ventanaCambio')?.value?.trim() || '',
+      iccid:           document.getElementById('iccid')?.value?.trim() || '',
+      contacto:        document.getElementById('contacto')?.value?.trim() || '',
+      observaciones:   document.getElementById('observaciones')?.value?.trim() || '',
+      asesor:          document.getElementById('asesor')?.value?.trim() || '',
+    };
+
+    try {
+      const resp = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await resp.json();
+      if (result.status === 'ok') {
+        alert('Registro exitoso. Radicado: ' + result.id);
+        form.reset();
+      } else {
+        alert('Error: ' + (result.message || 'No se pudo registrar'));
+      }
+    } catch (error) {
+      alert('Error de red: ' + error);
+    }
+  });
+});
