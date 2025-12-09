@@ -157,10 +157,35 @@ const datos={radicado:radicado,min:$min.value,contacto:contacto,cedula:$cedula.v
   localStorage.setItem('registros',JSON.stringify(registros));
   
 try {
-    fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(datos)
+    
+const formData = new FormData();
+formData.append('numeroPortar', document.getElementById('numeroPortar').value);
+formData.append('cedula', document.getElementById('cedula').value);
+formData.append('nombreCompleto', document.getElementById('nombreCompleto').value);
+formData.append('direccionCompleta', document.getElementById('direccionCompleta').value);
+formData.append('barrio', document.getElementById('barrio').value);
+formData.append('ciudad', document.getElementById('ciudad').value);
+formData.append('departamento', document.getElementById('departamento').value);
+formData.append('ventanaCambio', document.getElementById('ventanaCambio').value);
+formData.append('iccid', document.getElementById('iccid').value);
+formData.append('contacto', document.getElementById('contacto').value);
+formData.append('observaciones', document.getElementById('observaciones').value);
+formData.append('asesor', document.getElementById('asesor').value);
+
+fetch('https://script.google.com/macros/s/AKfycb.../exec', {
+  method: 'POST',
+  body: formData
+})
+.then(response => response.json())
+.then(result => {
+  alert('Registro enviado correctamente. Radicado: ' + result.radicado);
+  document.getElementById('miFormulario').reset();
+})
+.catch(error => {
+  alert('Error al enviar el registro');
+  console.error(error);
+});
+
     }).then(res=>{
         if(!res.ok) throw new Error('Error enviando el registro');
         alert('Registro enviado correctamente');
