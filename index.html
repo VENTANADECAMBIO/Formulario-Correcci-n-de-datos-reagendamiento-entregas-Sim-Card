@@ -237,8 +237,8 @@ function consultarCaso(){
   
 <!-- Integración con Google Apps Script (Web App) -->
 <script>
-  // 1) Pega aquí la URL de tu Web App (la que al abrir muestra {"status":"ok","msg":"Web App activo"})
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx7kGi2Futk0hxXU6aRFINaWiyUscvRKr_D0ll2pqfjtRz6-riQt5C4Bhzd9EJDWgNF8A/exec';
+  // 1) Pega aquí TU URL del Web App (la que mostró {"status":"ok","msg":"Web App activo"})
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxa_8ypenVRr-TPfuDyXPhyMjbQyIxbDj6Scn7UGEmrmcohMkVKGGvdcLOyy2hbE63y3g/exec';  // ← usa la tuya completa
 
   // 2) Conecta el envío del formulario
   const form = document.getElementById('miFormulario');
@@ -263,13 +263,22 @@ function consultarCaso(){
       };
 
       try {
+        // 🚫 Sin headers → evitamos preflight CORS y el 405
         const resp = await fetch(ENDPOINT, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
 
-        const result = await resp.json();
+        // Mostrar claramente la respuesta del servidor:
+        let result;
+        try {
+          result = await resp.json();                // intenta JSON
+        } catch (jsonErr) {
+          const text = await resp.text();            // si no es JSON, muestra el texto
+          alert('Respuesta del servidor (texto):\n' + text);
+          return;
+        }
+
         if (result.status === 'ok') {
           alert('Registro exitoso. Radicado: ' + result.id);
           form.reset();
@@ -281,9 +290,8 @@ function consultarCaso(){
       }
     });
   } else {
-    console.warn('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
+    alert('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
   }
 </script>
-
 </body>
 </html>
