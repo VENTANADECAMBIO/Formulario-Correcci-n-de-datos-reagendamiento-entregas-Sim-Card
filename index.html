@@ -1,303 +1,236 @@
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <title>Formulario Corrección de datos reagendamiento entregas Sim Card</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root { --claro-red:#E60000; --claro-dark:#333; --bg:#f7f7f7; }
-    *{box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:var(--bg);color:var(--claro-dark)}
-    header{background:var(--claro-red);color:#fff;padding:16px}
-    main{max-width:900px;margin:24px auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
-    h1,h3,h4{margin:0 0 12px}
-    label{font-weight:700;margin-bottom:6px;display:block}
-    input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px}
-    textarea{min-height:96px}
-    small{color:#666;display:block;margin-top:6px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-    .full{grid-column:1/-1}
-    .actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
-    button{background:var(--claro-red);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}
-    button.secondary{background:#eee;color:#333}
-    .status{margin-top:12px;font-weight:700}
-    .radicado{margin-top:12px;background:#f0fff0;border:1px solid #b6e3b6;padding:12px;border-radius:8px;display:none}
-    pre{background:#fafafa;padding:12px;border:1px solid #eee;border-radius:8px}
-    @media (max-width:760px){.grid{grid-template-columns:1fr}}
-    #hidden_iframe { width:0;height:0;border:0;position:absolute;left:-9999px; }
-  </style>
-</head>
-<body>
-  <header>
-    <strong>Formulario Corrección de datos reagendamiento entregas Sim Card</strong>
-  </header>
+<script>
+(function () {
+  /* ========== CONFIGURACIÓN ========== */
+  // 👉 Tu Web App (URL /exec de la nueva implementación)
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';
 
-  <main>
-    <h3>Formulario Corrección datos reagendamiento entregas Sim Card</h3>
+  // (Opcional) ID de tu Google Sheet para exportar a XLSX
+  // Si todavía no lo tienes, deja vacío (no afecta al envío).
+  const SHEET_ID = ''; // Ej.: '1AbCDEF...xyz'
 
-    <!-- FORMULARIO: conserva rótulos, orden y reglas tal como en tu ejemplo -->
-    <form id="formSim" novalidate>
-      <div class="grid">
-        <!-- Número a portar -->
-        <div>
-          <label for="numeroPortar">Número a portar</label>
-          <input id="numeroPortar" name="numeroPortar" inputmode="numeric" pattern="^\d{10}$" maxlength="10" required />
-          <small>El Número a portar debe ser numérico y tener exactamente 10 dígitos.</small>
-        </div>
-
-        <!-- Cédula -->
-        <div>
-          <label for="cedula">Cédula</label>
-          <input id="cedula" name="cedula" inputmode="numeric" pattern="^\d+$" required />
-          <small>La cédula debe contener únicamente números.</small>
-        </div>
-
-        <!-- Nombre Completo -->
-        <div class="full">
-          <label for="nombreCompleto">Nombre Completo</label>
-          <input id="nombreCompleto" name="nombreCompleto" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
-          <small>El nombre debe contener solo letras y espacios.</small>
-        </div>
-
-        <!-- Dirección Completa -->
-        <div class="full">
-          <label for="direccionCompleta">Dirección Completa</label>
-          <input id="direccionCompleta" name="direccionCompleta" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#\\-\\./\\/ ]+$" required />
-          <small>Incluye complementos: apartamento, torre, bloque, piso, etc. La dirección debe ser alfanumérica y puede incluir #, -, ., /.</small>
-        </div>
-
-        <!-- Barrio -->
-        <div>
-          <label for="barrio">Barrio</label>
-          <input id="barrio" name="barrio" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$" required />
-          <small>El barrio debe ser alfanumérico (letras y números).</small>
-        </div>
-
-        <!-- Ciudad -->
-        <div>
-          <label for="ciudad">Ciudad</label>
-          <input id="ciudad" name="ciudad" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
-        </div>
-
-        <!-- Departamento -->
-        <div>
-          <label for="departamento">Departamento</label>
-          <input id="departamento" name="departamento" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" required />
-          <small>El departamento debe contener solo letras y espacios.</small>
-        </div>
-
-        <!-- Ventana de Cambio -->
-        <div>
-          <label for="ventanaCambio">Ventana de Cambio (dd/mm/aaaa)</label>
-          <input id="ventanaCambio" name="ventanaCambio" placeholder="dd/mm/aaaa"
-                 pattern="^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{4}$" required />
-          <small>Formato de fecha inválido. Usa dd/mm/aaaa.</small>
-        </div>
-
-        <!-- ICCID -->
-        <div>
-          <label for="iccid">ICCID (20 dígitos y debe iniciar con 8957101)</label>
-          <input id="iccid" name="iccid" inputmode="numeric" pattern="^8957101\\d{13}$" maxlength="20" required />
-          <small>El ICCID debe ser numérico, iniciar con 8957101 y tener 20 dígitos.</small>
-        </div>
-
-        <!-- # DE CONTACTO -->
-        <div>
-          <label for="contacto"># DE CONTACTO</label>
-          <input id="contacto" name="contacto" inputmode="numeric" pattern="^\\d{10}$" maxlength="10" required />
-          <small>Debe ser un número distinto al Número a portar.</small>
-        </div>
-
-        <!-- Observaciones -->
-        <div class="full">
-          <label for="observaciones">Observaciones</label>
-          <textarea id="observaciones" name="observaciones" placeholder="Comentarios opcionales"></textarea>
-        </div>
-      </div>
-
-      <!-- BOTONES -->
-      <div class="actions">
-        <button type="submit">Guardar y Enviar</button>
-        <button type="reset" class="secondary">Cancelar</button>
-      </div>
-
-      <!-- Estado y radicado mostrado al usuario -->
-      <div id="status" class="status" aria-live="polite"></div>
-      <div id="radBox" class="radicado"><span id="radTxt"></span></div>
-
-      <!-- Bloque “Ver Descargas” y “Consulta de Caso”, preservados -->
-      <div style="margin-top:16px"><strong>Ver Descargas</strong></div>
-
-      <h4>Consulta de Caso</h4>
-      <div class="grid">
-        <div>
-          <label for="consultaQ">Ingrese Radicado, MIN o Cédula</label>
-          <input id="consultaQ" />
-        </div>
-        <div style="align-self:end">
-          <button id="btnConsultar" type="button" class="secondary">Consultar</button>
-        </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <button id="btnExport" type="button" class="secondary">Exportar XLSX</button>
-      </div>
-
-      <pre id="resultadoConsulta"></pre>
-    </form>
-
-    <!-- Plan B: iframe oculto para POST clásico sin CORS (si el navegador bloquea fetch) -->
-    <iframe id="hidden_iframe" name="hidden_iframe"></iframe>
-    <form id="fallbackForm" action="" method="POST" target="hidden_iframe" style="display:none">
-      <input type="hidden" name="json" id="fallbackJson">
-    </form>
-  </main>
-
-  <script>
-    /* ===================== CONFIGURACIÓN ===================== */
-    // Tu Web App (URL /exec recién desplegada)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';
-
-    // (Opcional) ID del Google Sheet para exportar a XLSX
-    const SHEET_ID   = ''; // Ej.: '1AbCDEF...xyz'. Si no lo tienes, deja vacío; no afecta el envío.
-
-    /* ===================== LÓGICA DEL FORMULARIO ===================== */
-    const form     = document.getElementById('formSim');
-    const statusEl = document.getElementById('status');
-    const radBox   = document.getElementById('radBox');
-    const radTxt   = document.getElementById('radTxt');
-    const resultado= document.getElementById('resultadoConsulta');
-
-    // Arma payload con nombres normalizados y también con rótulos originales (labels)
-    function buildPayload() {
-      const numeroPortar = document.getElementById('numeroPortar').value.trim();
-      const contacto     = document.getElementById('contacto').value.trim();
-
-      const data = {
-        // 🎯 Claves normalizadas (Apps Script/JSON):
-        numeroPortar,
-        cedula: document.getElementById('cedula').value.trim(),
-        nombreCompleto: document.getElementById('nombreCompleto').value.trim(),
-        direccionCompleta: document.getElementById('direccionCompleta').value.trim(),
-        barrio: document.getElementById('barrio').value.trim(),
-        ciudad: document.getElementById('ciudad').value.trim(),
-        departamento: document.getElementById('departamento').value.trim(),
-        ventanaCambio: document.getElementById('ventanaCambio').value.trim(),
-        iccid: document.getElementById('iccid').value.trim(),
-        contacto,
-        observaciones: document.getElementById('observaciones').value.trim()
-      };
-
-      // 🏷️ También envía los rótulos originales por si tu backend los usa tal cual
-      data.labels = {
-        'Número a portar': data.numeroPortar,
-        'Cédula': data.cedula,
-        'Nombre Completo': data.nombreCompleto,
-        'Dirección Completa': data.direccionCompleta,
-        'Barrio': data.barrio,
-        'Ciudad': data.ciudad,
-        'Departamento': data.departamento,
-        'Ventana de Cambio (dd/mm/aaaa)': data.ventanaCambio,
-        'ICCID (20 dígitos y debe iniciar con 8957101)': data.iccid,
-        '# DE CONTACTO': data.contacto,
-        'Observaciones': data.observaciones
-      };
-
-      return data;
-    }
-
-    // Envío principal (fetch) y plan B (iframe) para máxima compatibilidad
-    form.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      statusEl.textContent = '';
-      radBox.style.display = 'none';
-      radTxt.textContent = '';
-
-      // Validaciones nativas HTML5
-      if (!form.reportValidity()) {
-        statusEl.textContent = 'Por favor corrige los campos marcados.';
-        return;
-      }
-
-      // Validación adicional: contacto ≠ número a portar
-      const numeroPortar = document.getElementById('numeroPortar').value.trim();
-      const contacto     = document.getElementById('contacto').value.trim();
-      if (numeroPortar === contacto) {
-        statusEl.textContent = 'El # de contacto debe ser distinto al Número a portar.';
-        document.getElementById('contacto').focus();
-        return;
-      }
-
-      const payload = buildPayload();
-
-      try {
-        statusEl.textContent = 'Enviando…';
-
-        // Patrón que evita preflight CORS en la mayoría de casos
-        const resp = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          redirect: 'follow',
-          body: JSON.stringify(payload)
-        });
-
-        const bodyText = await resp.text();
-        let j = {};
-        try { j = JSON.parse(bodyText); } catch {}
-
-        if (resp.ok && j.ok) {
-          statusEl.textContent = '✅ Guardado correctamente.';
-          if (j.radicado) {
-            radTxt.textContent = `Tu RADICADO es: ${j.radicado}`;
-            radBox.style.display = 'block';
-          }
-          form.reset();
-        } else {
-          // Si el servidor devolvió error, lo mostramos
-          statusEl.textContent = '❌ ' + (j.error || `Error HTTP ${resp.status}`);
-          // (Opcional) Fallback si quieres intentar guardado clásico:
-          // fallbackPost(payload);
+  /* ========== UTILIDADES ========== */
+  // Encuentra un campo por el texto exacto del <label>
+  function getFieldByLabel(formEl, labelText) {
+    const labels = formEl.querySelectorAll('label');
+    for (const label of labels) {
+      const txt = (label.textContent || '').trim();
+      if (txt === labelText) {
+        const forId = label.getAttribute('for');
+        if (forId) {
+          const el = formEl.querySelector('#' + CSS.escape(forId));
+          if (el) return el;
         }
-      } catch (error) {
-        console.error('[fetch error]', error);
-        statusEl.textContent = '❌ No se pudo enviar (conexión).';
-        // Intento alternativo sin CORS:
-        fallbackPost(payload);
+        // Si no hay "for", intenta el siguiente control
+        const next = label.nextElementSibling;
+        if (next && next.matches('input, textarea, select')) return next;
+        if (next) {
+          const el = next.querySelector('input, textarea, select');
+          if (el) return el;
+        }
       }
-    });
-
-    // Plan B: POST clásico con iframe oculto (evita CORS)
-    function fallbackPost(payload) {
-      const fb = document.getElementById('fallbackForm');
-      const fbJson = document.getElementById('fallbackJson');
-      fb.action = SCRIPT_URL;
-      fbJson.value = JSON.stringify(payload);
-      fb.submit();
-      alert('Se intentó envío alternativo. Verifica la hoja en unos segundos.');
     }
+    return null;
+  }
 
-    // Consulta de Caso: admite Radicado, MIN o Cédula en un único campo
-    document.getElementById('btnConsultar').addEventListener('click', async () => {
-      const q = document.getElementById('consultaQ').value.trim();
-      if (!q) { resultado.textContent = 'Ingresa un valor para consultar.'; return; }
-      resultado.textContent = 'Consultando…';
+  // Normaliza claves (por si tu backend las usa así)
+  function normalizeKey(text) {
+    return text
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita tildes
+      .toLowerCase().replace(/[^a-z0-9]+/g, '_')        // espacios -> _
+      .replace(/^_+|_+$/g, '');
+  }
+
+  // Construye payload preservando rótulos originales y claves normalizadas
+  function collectPayload(formEl, labelList) {
+    const labelsObj = {};
+    const dataObj   = {};
+    for (const L of labelList) {
+      const field = getFieldByLabel(formEl, L);
+      const val   = field ? String(field.value || '').trim() : '';
+      labelsObj[L] = val;
+      dataObj[normalizeKey(L)] = val;
+    }
+    // Observaciones u otros campos con name (si no tienen label)
+    formEl.querySelectorAll('input[name], textarea[name], select[name]').forEach(el => {
+      const n = el.getAttribute('name');
+      if (n && !(n in labelsObj)) labelsObj[n] = String(el.value || '').trim();
+    });
+    return { labels: labelsObj, data: dataObj };
+  }
+
+  // Validaciones según tus reglas
+  function validarCampos(formEl) {
+    const get = (t) => (getFieldByLabel(formEl, t) || { value: '' }).value.trim();
+
+    const numeroPortar = get('Número a portar');
+    const cedula       = get('Cédula');
+    const nombre       = get('Nombre Completo');
+    const direccion    = get('Dirección Completa');
+    const barrio       = get('Barrio');
+    const ciudad       = get('Ciudad');
+    const departamento = get('Departamento');
+    const ventana      = get('Ventana de Cambio (dd/mm/aaaa)');
+    const iccid        = get('ICCID (20 dígitos y debe iniciar con 8957101)');
+    const contacto     = get('# DE CONTACTO');
+
+    // Número a portar: 10 dígitos, numérico
+    if (!/^\d{10}$/.test(numeroPortar)) {
+      alert('Número a portar inválido: debe ser numérico y de 10 dígitos.');
+      (getFieldByLabel(formEl, 'Número a portar') || {}).focus?.();
+      return false;
+    }
+    // Cédula: solo números
+    if (!/^\d+$/.test(cedula)) {
+      alert('Cédula inválida: solo números.');
+      (getFieldByLabel(formEl, 'Cédula') || {}).focus?.();
+      return false;
+    }
+    // Nombre: letras y espacios (con tildes)
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(nombre)) {
+      alert('Nombre inválido: solo letras y espacios.');
+      (getFieldByLabel(formEl, 'Nombre Completo') || {}).focus?.();
+      return false;
+    }
+    // Dirección: alfanumérica y símbolos permitidos # - . /
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#\-\./\/ ]+$/.test(direccion)) {
+      alert('Dirección inválida: usa letras, números y # - . /.');
+      (getFieldByLabel(formEl, 'Dirección Completa') || {}).focus?.();
+      return false;
+    }
+    // Barrio: alfanumérico
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/.test(barrio)) {
+      alert('Barrio inválido: usa letras y números.');
+      (getFieldByLabel(formEl, 'Barrio') || {}).focus?.();
+      return false;
+    }
+    // Ciudad / Departamento: letras y espacios
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(ciudad)) {
+      alert('Ciudad inválida: usa solo letras y espacios.');
+      (getFieldByLabel(formEl, 'Ciudad') || {}).focus?.();
+      return false;
+    }
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(departamento)) {
+      alert('Departamento inválido: usa solo letras y espacios.');
+      (getFieldByLabel(formEl, 'Departamento') || {}).focus?.();
+      return false;
+    }
+    // Ventana de Cambio: dd/mm/aaaa
+    if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(ventana)) {
+      alert('Ventana de Cambio inválida: usa formato dd/mm/aaaa.');
+      (getFieldByLabel(formEl, 'Ventana de Cambio (dd/mm/aaaa)') || {}).focus?.();
+      return false;
+    }
+    // ICCID: 20 dígitos y empieza con 8957101
+    if (!/^8957101\d{13}$/.test(iccid)) {
+      alert('ICCID inválido: debe iniciar con 8957101 y tener 20 dígitos.');
+      (getFieldByLabel(formEl, 'ICCID (20 dígitos y debe iniciar con 8957101)') || {}).focus?.();
+      return false;
+    }
+    // # de contacto: 10 dígitos, distinto al número a portar
+    if (!/^\d{10}$/.test(contacto)) {
+      alert('# de contacto inválido: debe ser numérico y de 10 dígitos.');
+      (getFieldByLabel(formEl, '# DE CONTACTO') || {}).focus?.();
+      return false;
+    }
+    if (contacto === numeroPortar) {
+      alert('# de contacto debe ser distinto al Número a portar.');
+      (getFieldByLabel(formEl, '# DE CONTACTO') || {}).focus?.();
+      return false;
+    }
+    return true;
+  }
+
+  /* ========== ENVÍO PRINCIPAL ========== */
+  const form = document.querySelector('form'); // toma el primer formulario de la página
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // 1) Valida según tus reglas y las nativas del navegador
+    if (form.checkValidity && !form.checkValidity()) {
+      form.reportValidity && form.reportValidity();
+      return;
+    }
+    if (!validarCampos(form)) return;
+
+    // 2) Arma el payload con TUS rótulos (labels) —preserva parámetros originales
+    const CAMPOS = [
+      'Número a portar',
+      'Cédula',
+      'Nombre Completo',
+      'Dirección Completa',
+      'Barrio',
+      'Ciudad',
+      'Departamento',
+      'Ventana de Cambio (dd/mm/aaaa)',
+      'ICCID (20 dígitos y debe iniciar con 8957101)',
+      '# DE CONTACTO',
+      'Observaciones'
+    ];
+    const payload = collectPayload(form, CAMPOS);
+
+    // 3) Envía al Web App
+    try {
+      const resp = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        redirect: 'follow',
+        body: JSON.stringify(payload)
+      });
+      const txt = await resp.text();
+      let data = {};
+      try { data = JSON.parse(txt); } catch {}
+
+      if (resp.ok && data.ok) {
+        alert('Enviado correctamente.' + (data.radicado ? '\nRADICADO: ' + data.radicado : ''));
+        form.reset();
+      } else {
+        alert('No se pudo enviar el registro.\n' + (data.error || ('HTTP ' + resp.status)));
+      }
+    } catch (err) {
+      alert('No se pudo enviar el registro.\n' + (err && err.message ? err.message : err));
+    }
+  });
+
+  /* ========== BOTÓN “Consultar” (si existe) ========== */
+  // Busca un input de consulta y un botón con texto “Consultar”
+  const btnConsultar = Array.from(document.querySelectorAll('button'))
+    .find(b => (b.textContent || '').trim().toLowerCase() === 'consultar');
+  const campoConsulta =
+    document.getElementById('consultaNumero') ||
+    document.getElementById('consultaQ') ||
+    getFieldByLabel(form, 'Ingrese Radicado, MIN o Cédula');
+
+  if (btnConsultar && campoConsulta) {
+    btnConsultar.addEventListener('click', async () => {
+      const q = String(campoConsulta.value || '').trim();
+      if (!q) { alert('Ingresa un valor para consultar.'); return; }
       try {
         const r = await fetch(`${SCRIPT_URL}?q=${encodeURIComponent(q)}`);
         const t = await r.text();
         const j = JSON.parse(t);
-        resultado.textContent = j.ok ? JSON.stringify(j.data || j, null, 2) : ('No encontrado: ' + (j.error || ''));
+        alert(j.ok ? 'Consulta OK:\n' + JSON.stringify(j.data || j, null, 2)
+                   : 'No encontrado: ' + (j.error || ''));
       } catch {
-        resultado.textContent = 'Error consultando el caso.';
+        alert('Error consultando el caso.');
       }
     });
+  }
 
-    // Exportar XLSX (si configuras SHEET_ID)
-    document.getElementById('btnExport').addEventListener('click', () => {
-      if (!SHEET_ID) { alert('Configura el SHEET_ID en el código para habilitar la exportación.'); return; }
+  /* ========== BOTÓN “Exportar XLSX” (si existe y hay SHEET_ID) ========== */
+  const btnExport = Array.from(document.querySelectorAll('button'))
+    .find(b => (b.textContent || '').trim().toLowerCase().includes('exportar xlsx'));
+  if (btnExport) {
+    btnExport.addEventListener('click', () => {
+      if (!SHEET_ID) {
+        alert('Configura el SHEET_ID en el script para habilitar la exportación a XLSX.');
+        return;
+      }
       const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
       window.open(url, '_blank');
     });
-  </script>
-</body>
-</html>
+  }
+})();
+</script>
