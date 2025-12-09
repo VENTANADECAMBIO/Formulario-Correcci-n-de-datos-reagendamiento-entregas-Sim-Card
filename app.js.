@@ -1,6 +1,6 @@
 
 // URL del Web App de Apps Script (pega la tuya aquí)
-const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx7kGi2Futk0hxXU6aRFINaWiyUscvRKr_D0ll2pqfjtRz6-riQt5C4Bhzd9EJDWgNF8A/exec';
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxa_8ypenVRr-TPfuDyXPhyMjbQyIxbDj6Scn7UGEmrmcohMkVKGGvdcLOyy2hbE63y3g/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Asegúrate de que tu formulario tenga id="miFormulario"
