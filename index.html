@@ -234,5 +234,56 @@ function consultarCaso(){
   if(resultado){document.getElementById('resultadoConsulta').innerHTML='<p>Estado del caso ('+valor+'): '+resultado.estado+'</p>';}else{document.getElementById('resultadoConsulta').innerHTML='<p>No se encontró el caso.</p>';}
 }
 </script>
+  
+<!-- Integración con Google Apps Script (Web App) -->
+<script>
+  // 1) Pega aquí la URL de tu Web App (la que al abrir muestra {"status":"ok","msg":"Web App activo"})
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbx7kGi2Futk0hxXU6aRFINaWiyUscvRKr_D0ll2pqfjtRz6-riQt5C4Bhzd9EJDWgNF8A/exec';
+
+  // 2) Conecta el envío del formulario
+  const form = document.getElementById('miFormulario');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 3) Captura de campos por ID (ajusta si alguno difiere)
+      const data = {
+        numeroPortacion: document.getElementById('numeroPortacion')?.value?.trim() || '',
+        cedula:          document.getElementById('cedula')?.value?.trim() || '',
+        nombre:          document.getElementById('nombre')?.value?.trim() || '',
+        direccion:       document.getElementById('direccion')?.value?.trim() || '',
+        barrio:          document.getElementById('barrio')?.value?.trim() || '',
+        ciudad:          document.getElementById('ciudad')?.value?.trim() || '',
+        departamento:    document.getElementById('departamento')?.value?.trim() || '',
+        ventanaCambio:   document.getElementById('ventanaCambio')?.value?.trim() || '',
+        iccid:           document.getElementById('iccid')?.value?.trim() || '',
+        contacto:        document.getElementById('contacto')?.value?.trim() || '',
+        observaciones:   document.getElementById('observaciones')?.value?.trim() || '',
+        asesor:          document.getElementById('asesor')?.value?.trim() || '',
+      };
+
+      try {
+        const resp = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await resp.json();
+        if (result.status === 'ok') {
+          alert('Registro exitoso. Radicado: ' + result.id);
+          form.reset();
+        } else {
+          alert('Error: ' + (result.message || 'No se pudo registrar'));
+        }
+      } catch (error) {
+        alert('Error de red: ' + error);
+      }
+    });
+  } else {
+    console.warn('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
+  }
+</script>
+
 </body>
 </html>
