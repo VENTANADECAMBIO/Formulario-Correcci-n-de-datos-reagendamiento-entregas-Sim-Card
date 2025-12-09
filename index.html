@@ -78,7 +78,7 @@
     <textarea id='observaciones' rows='3'></textarea>
 
     <div class='buttons'>
-      <button type='button' class='btn-save' onclick='guardarDatos()'>Guardar y Enviar</button>
+      <button type="submit" class="btn-save">Guardar y Enviar</button>
       <button type='reset' class='btn-cancel'>Cancelar</button>
     </div>
   </form>
@@ -156,8 +156,6 @@ const datos={radicado:radicado,min:$min.value,contacto:contacto,cedula:$cedula.v
   registros.push(datos);
   localStorage.setItem('registros',JSON.stringify(registros));
   
-try {
-    
 const formData = new FormData();
 formData.append('numeroPortar', document.getElementById('numeroPortar').value);
 formData.append('cedula', document.getElementById('cedula').value);
