@@ -157,7 +157,7 @@ const datos={radicado:radicado,min:$min.value,contacto:contacto,cedula:$cedula.v
   localStorage.setItem('registros',JSON.stringify(registros));
   
 try {
-    fetch('https://script.google.com/macros/s/AKfycb.../exec', {
+    fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(datos)
@@ -407,7 +407,90 @@ function consultarCaso(){
     }
   });
 })();
+</script> 
+<!-- FORMULARIO -->
+<form id="miFormulario" style="max-width:600px;margin:auto;font-family:Arial;">
+  <h2 style="color:#E30613;text-align:center;">Formulario Ventana de Cambio</h2>
+
+  <label>Número a portar:</label>
+  <input type="text" id="numeroPortar" required><br><br>
+
+  <label>Cédula:</label>
+  <input type="text" id="cedula" required><br><br>
+
+  <label>Nombre Completo:</label>
+  <input type="text" id="nombreCompleto" required><br><br>
+
+  <label>Dirección Completa:</label>
+  <input type="text" id="direccionCompleta" required><br><br>
+
+  <label>Barrio:</label>
+  <input type="text" id="barrio" required><br><br>
+
+  <label>Ciudad:</label>
+  <input type="text" id="ciudad" required><br><br>
+
+  <label>Departamento:</label>
+  <input type="text" id="departamento" required><br><br>
+
+  <label>Ventana de Cambio:</label>
+  <input type="date" id="ventanaCambio" required><br><br>
+
+  <label>ICCID:</label>
+  <input type="text" id="iccid" required><br><br>
+
+  <label># DE CONTACTO:</label>
+  <input type="text" id="contacto" required><br><br>
+
+  <label>Observaciones:</label>
+  <textarea id="observaciones"></textarea><br><br>
+
+  <label>Asesor:</label>
+  <input type="text" id="asesor" required><br><br>
+
+  <button type="submit" style="background:#E30613;color:white;padding:10px 20px;border:none;cursor:pointer;">Guardar y Enviar</button>
+</form>
+
+<!-- SCRIPT PARA ENVIAR DATOS -->
+<script>
+document.getElementById('miFormulario').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const data = {
+    numeroPortar: document.getElementById('numeroPortar').value,
+    cedula: document.getElementById('cedula').value,
+    nombreCompleto: document.getElementById('nombreCompleto').value,
+    direccionCompleta: document.getElementById('direccionCompleta').value,
+    barrio: document.getElementById('barrio').value,
+    ciudad: document.getElementById('ciudad').value,
+    departamento: document.getElementById('departamento').value,
+    ventanaCambio: document.getElementById('ventanaCambio').value,
+    iccid: document.getElementById('iccid').value,
+    contacto: document.getElementById('contacto').value,
+    observaciones: document.getElementById('observaciones').value,
+    asesor: document.getElementById('asesor').value
+  };
+
+  fetch('TU_URL_DE_APPS_SCRIPT', { // Reemplaza con tu URL de Google Apps Script
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    alert('Registro enviado correctamente. Radicado: ' + result.radicado);
+    document.getElementById('miFormulario').reset();
+  })
+  .catch(error => {
+    alert('Error al enviar el registro');
+    console.error(error);
+  });
+});
 </script>
+
 
 </body>
 </html>
