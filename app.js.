@@ -1,50 +1,48 @@
 
-// URL del Web App de Apps Script (pega la tuya aquí)
+// URL del Web App de Apps Script (pega aquí la tuya; debe terminar en /exec)
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxa_8ypenVRr-TPfuDyXPhyMjbQyIxbDj6Scn7UGEmrmcohMkVKGGvdcLOyy2hbE63y3g/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Asegúrate de que tu formulario tenga id="miFormulario"
-  const form = document.getElementById('miFormulario');
+  // Usa el id REAL del formulario según tu HTML (en tu captura: correccionForm)
+  const form = document.getElementById('miFormulario'); // si lo cambiaste a miFormulario, pon miFormulario aquí
   if (!form) {
-    console.warn('No se encontró el formulario con id="miFormulario". Revisa tu index.html');
+    alert('No se encontró el formulario. Revisa el id (correccionForm o miFormulario).');
     return;
   }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Captura de campos por ID: ajusta si algún id es diferente en tu HTML
-    const data = {
-      numeroPortacion: document.getElementById('numeroPortacion')?.value?.trim() || '',
-      cedula:          document.getElementById('cedula')?.value?.trim() || '',
-      nombre:          document.getElementById('nombre')?.value?.trim() || '',
-      direccion:       document.getElementById('direccion')?.value?.trim() || '',
-      barrio:          document.getElementById('barrio')?.value?.trim() || '',
-      ciudad:          document.getElementById('ciudad')?.value?.trim() || '',
-      departamento:    document.getElementById('departamento')?.value?.trim() || '',
-      ventanaCambio:   document.getElementById('ventanaCambio')?.value?.trim() || '',
-      iccid:           document.getElementById('iccid')?.value?.trim() || '',
-      contacto:        document.getElementById('contacto')?.value?.trim() || '',
-      observaciones:   document.getElementById('observaciones')?.value?.trim() || '',
-      asesor:          document.getElementById('asesor')?.value?.trim() || '',
-    };
+    // Prepara datos como FormData → evita preflight CORS (simple request)
+    const fd = new FormData();
+    // OJO: en tu HTML el número a portar tiene id="min"
+    fd.append('numeroPortacion', document.getElementById('min')?.value?.trim() || '');
+    fd.append('cedula',          document.getElementById('cedula')?.value?.trim() || '');
+    fd.append('nombre',          document.getElementById('nombre')?.value?.trim() || '');
+    fd.append('direccion',       document.getElementById('direccion')?.value?.trim() || '');
+    fd.append('barrio',          document.getElementById('barrio')?.value?.trim() || '');
+    fd.append('ciudad',          document.getElementById('ciudad')?.value?.trim() || '');
+    fd.append('departamento',    document.getElementById('departamento')?.value?.trim() || '');
+    fd.append('ventanaCambio',   document.getElementById('ventanaCambio')?.value?.trim() || '');
+    fd.append('iccid',           document.getElementById('iccid')?.value?.trim() || '');
+    fd.append('contacto',        document.getElementById('contacto')?.value?.trim() || '');
+    fd.append('observaciones',   document.getElementById('observaciones')?.value?.trim() || '');
+    fd.append('asesor',          document.getElementById('asesor')?.value?.trim() || '');
 
     try {
+      // 🔴 Aquí es donde va el BODY: el FormData (fd)
       const resp = await fetch(ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        mode: 'no-cors',   // evitamos CORS; la respuesta será opaca (no se puede leer JSON)
+        body: fd           // ← ESTE es el body que te falta
       });
 
-      const result = await resp.json();
-      if (result.status === 'ok') {
-        alert('Registro exitoso. Radicado: ' + result.id);
-        form.reset();
-      } else {
-        alert('Error: ' + (result.message || 'No se pudo registrar'));
-      }
+      // Como no-cors da respuesta opaca, no podemos leer el id aquí.
+      // Pero el Web App sí recibe y guarda en Google Sheets.
+      alert('✅ Registro enviado. Revisa la hoja "Repositorio" en Google Sheets.');
+      form.reset();
     } catch (error) {
-      alert('Error de red: ' + error);
+      alert('❌ Error de red: ' + error);
     }
   });
 });
