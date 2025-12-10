@@ -78,7 +78,7 @@
     <textarea id='observaciones' rows='3'></textarea>
 
     <div class='buttons'>
-      <button type="submit" class="btn-save">Guardar y Enviar</button>
+      <button type='button' class='btn-save' onclick='guardarDatos()'>Guardar y Enviar</button>
       <button type='reset' class='btn-cancel'>Cancelar</button>
     </div>
   </form>
@@ -156,34 +156,11 @@ const datos={radicado:radicado,min:$min.value,contacto:contacto,cedula:$cedula.v
   registros.push(datos);
   localStorage.setItem('registros',JSON.stringify(registros));
   
-const formData = new FormData();
-formData.append('numeroPortar', document.getElementById('numeroPortar').value);
-formData.append('cedula', document.getElementById('cedula').value);
-formData.append('nombreCompleto', document.getElementById('nombreCompleto').value);
-formData.append('direccionCompleta', document.getElementById('direccionCompleta').value);
-formData.append('barrio', document.getElementById('barrio').value);
-formData.append('ciudad', document.getElementById('ciudad').value);
-formData.append('departamento', document.getElementById('departamento').value);
-formData.append('ventanaCambio', document.getElementById('ventanaCambio').value);
-formData.append('iccid', document.getElementById('iccid').value);
-formData.append('contacto', document.getElementById('contacto').value);
-formData.append('observaciones', document.getElementById('observaciones').value);
-formData.append('asesor', document.getElementById('asesor').value);
-
-fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', {
-  method: 'POST',
-  body: formData
-})
-.then(response => response.json())
-.then(result => {
-  alert('Registro enviado correctamente. Radicado: ' + result.radicado);
-  document.getElementById('miFormulario').reset();
-})
-.catch(error => {
-  alert('Error al enviar el registro');
-  console.error(error);
-});
-
+try {
+    fetch('https://script.google.com/macros/s/AKfycb.../exec', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datos)
     }).then(res=>{
         if(!res.ok) throw new Error('Error enviando el registro');
         alert('Registro enviado correctamente');
@@ -261,7 +238,7 @@ function consultarCaso(){
 <!-- Integración con Google Apps Script (Web App) -->
 <script>
   // 1) Pega aquí TU URL del Web App (la que mostró {"status":"ok","msg":"Web App activo"})
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';  // ← usa la tuya completa
+  const ENDPOINT = '';  // ← usa la tuya completa
 
   // 2) Conecta el envío del formulario
   const form = document.getElementById('miFormulario');
@@ -316,204 +293,5 @@ function consultarCaso(){
     alert('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
   }
 </script>
-(function () {
-  // ⛳ Pega aquí TU URL /exec (del PASO 1)
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec';
-  // Encuentra el primer formulario de la página (no cambia tu HTML)
-  const form = document.querySelector('form');
-  if (!form) return;
-
-  // Utilidad: obtener el campo por el texto exacto del <label>
-  function getFieldByLabel(formEl, labelText) {
-    const labels = formEl.querySelectorAll('label');
-    for (const label of labels) {
-      const txt = (label.textContent || '').trim();
-      if (txt === labelText) {
-        const forId = label.getAttribute('for');
-        if (forId) {
-          const el = formEl.querySelector('#' + CSS.escape(forId));
-          if (el) return el;
-        }
-        const next = label.nextElementSibling;
-        if (next && next.matches('input, textarea, select')) return next;
-        if (next) {
-          const el = next.querySelector('input, textarea, select');
-          if (el) return el;
-        }
-      }
-    }
-    return null;
-  }
-
-  // Construir payload con tus rótulos originales
-  function buildPayload(formEl) {
-    const campos = [
-      'Número a portar',
-      'Cédula',
-      'Nombre Completo',
-      'Dirección Completa',
-      'Barrio',
-      'Ciudad',
-      'Departamento',
-      'Ventana de Cambio (dd/mm/aaaa)',
-      'ICCID (20 dígitos y debe iniciar con 8957101)',
-      '# DE CONTACTO',
-      'Observaciones'
-    ];
-    const labels = {};
-    campos.forEach(L => {
-      const el = getFieldByLabel(formEl, L);
-      labels[L] = el ? String(el.value || '').trim() : '';
-    });
-    return { labels };
-  }
-
-  // Validaciones según tus reglas
-  function validar(formEl) {
-    const get = (t) => (getFieldByLabel(formEl, t) || { value: '' }).value.trim();
-    const numero = get('Número a portar');
-    const cedula = get('Cédula');
-    const nombre = get('Nombre Completo');
-    const direccion = get('Dirección Completa');
-    const barrio = get('Barrio');
-    const ciudad = get('Ciudad');
-    const depto = get('Departamento');
-    const ventana = get('Ventana de Cambio (dd/mm/aaaa)');
-    const iccid = get('ICCID (20 dígitos y debe iniciar con 8957101)');
-    const contacto = get('# DE CONTACTO');
-
-    if (!/^\d{10}$/.test(numero)) { alert('Número a portar inválido: 10 dígitos numéricos.'); return false; }
-    if (!/^\d+$/.test(cedula)) { alert('Cédula inválida: solo números.'); return false; }
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(nombre)) { alert('Nombre inválido: solo letras y espacios.'); return false; }
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#\-\./\/ ]+$/.test(direccion)) { alert('Dirección inválida: usa letras, números y # - . /.'); return false; }
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+$/.test(barrio)) { alert('Barrio inválido: alfanumérico.'); return false; }
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(ciudad)) { alert('Ciudad inválida: solo letras y espacios.'); return false; }
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(depto)) { alert('Departamento inválido: solo letras y espacios.'); return false; }
-    if (!/^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(ventana)) { alert('Ventana de Cambio inválida: usa dd/mm/aaaa.'); return false; }
-    if (!/^8957101\d{13}$/.test(iccid)) { alert('ICCID inválido: debe iniciar con 8957101 y tener 20 dígitos.'); return false; }
-    if (!/^\d{10}$/.test(contacto)) { alert('# de contacto inválido: 10 dígitos numéricos.'); return false; }
-    if (contacto === numero) { alert('# de contacto debe ser distinto al Número a portar.'); return false; }
-    return true;
-  }
-
-  // Envío (no altera tu diseño)
-  form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-
-    if (form.checkValidity && !form.checkValidity()) {
-      form.reportValidity && form.reportValidity();
-      return;
-    }
-    if (!validar(form)) return;
-
-    const payload = buildPayload(form);
-
-    try {
-      const resp = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        redirect: 'follow',
-        body: JSON.stringify(payload)
-      });
-      const txt = await resp.text();
-      let data = {};
-      try { data = JSON.parse(txt); } catch {}
-
-      if (resp.ok && data.ok) {
-        alert('Enviado correctamente.' + (data.radicado ? '\nRADICADO: ' + data.radicado : ''));
-        form.reset();
-      } else {
-        alert('No se pudo enviar el registro.\n' + (data.error || ('HTTP ' + resp.status)));
-      }
-    } catch (err) {
-      alert('No se pudo enviar el registro.\n' + (err && err.message ? err.message : err));
-    }
-  });
-})();
-</script> 
-<!-- FORMULARIO -->
-<form id="miFormulario" style="max-width:600px;margin:auto;font-family:Arial;">
-  <h2 style="color:#E30613;text-align:center;">Formulario Ventana de Cambio</h2>
-
-  <label>Número a portar:</label>
-  <input type="text" id="numeroPortar" required><br><br>
-
-  <label>Cédula:</label>
-  <input type="text" id="cedula" required><br><br>
-
-  <label>Nombre Completo:</label>
-  <input type="text" id="nombreCompleto" required><br><br>
-
-  <label>Dirección Completa:</label>
-  <input type="text" id="direccionCompleta" required><br><br>
-
-  <label>Barrio:</label>
-  <input type="text" id="barrio" required><br><br>
-
-  <label>Ciudad:</label>
-  <input type="text" id="ciudad" required><br><br>
-
-  <label>Departamento:</label>
-  <input type="text" id="departamento" required><br><br>
-
-  <label>Ventana de Cambio:</label>
-  <input type="date" id="ventanaCambio" required><br><br>
-
-  <label>ICCID:</label>
-  <input type="text" id="iccid" required><br><br>
-
-  <label># DE CONTACTO:</label>
-  <input type="text" id="contacto" required><br><br>
-
-  <label>Observaciones:</label>
-  <textarea id="observaciones"></textarea><br><br>
-
-  <label>Asesor:</label>
-  <input type="text" id="asesor" required><br><br>
-
-  <button type="submit" style="background:#E30613;color:white;padding:10px 20px;border:none;cursor:pointer;">Guardar y Enviar</button>
-</form>
-
-<!-- SCRIPT PARA ENVIAR DATOS -->
-<script>
-document.getElementById('miFormulario').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const data = {
-    numeroPortar: document.getElementById('numeroPortar').value,
-    cedula: document.getElementById('cedula').value,
-    nombreCompleto: document.getElementById('nombreCompleto').value,
-    direccionCompleta: document.getElementById('direccionCompleta').value,
-    barrio: document.getElementById('barrio').value,
-    ciudad: document.getElementById('ciudad').value,
-    departamento: document.getElementById('departamento').value,
-    ventanaCambio: document.getElementById('ventanaCambio').value,
-    iccid: document.getElementById('iccid').value,
-    contacto: document.getElementById('contacto').value,
-    observaciones: document.getElementById('observaciones').value,
-    asesor: document.getElementById('asesor').value
-  };
-
-  fetch('https://script.google.com/macros/s/AKfycbyXTxp8tNTtq5AcTtYINxwgW4184AR3QXhXDtaEAG2_kATnvWGjW7zKCLdEIkTPTBJWuA/exec', { //
-    method: 'POST',
-    mode: 'cors',
-    headers: { Reemplaza con tu URL de Google Apps Script
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-    alert('Registro enviado correctamente. Radicado: ' + result.radicado);
-    document.getElementById('miFormulario').reset();
-  })
-  .catch(error => {
-    alert('Error al enviar el registro');
-    console.error(error);
-  });
-});
-</script>
-
-
 </body>
 </html>
