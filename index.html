@@ -293,107 +293,42 @@ function consultarCaso(){
     alert('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
   }
 </script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzEuGScxu-lS16cgbb9ZUD7mHccbr3AgU0oqdH43cN3JHqMYXG5-mviHxitvT5-axZe/exec'; // reemplaza con la URL que copiaste
 
-<script>
-/* ===========================
-   CONFIGURACIÓN
-=========================== */
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw95AyQ1wXHDJuA0gt_vCrsonga7gIeXqESpCoPqGKoIFdBKMa7yA7datt7kBJxbqL_/exec'; 
-// EJEMPLO: 'https://script.google.com/macros/s/AKfycbXXXXXXXXXXXXXXX/exe'
-// Debe ser la URL del despliegue Web App (Execute as: Me, Access: Anyone).
-
-/* ===========================
-   UTILIDADES: RECOLECCIÓN DE CAMPOS
-   - No cambia tu HTML ni estilos.
-   - Lee todos los input/textarea/select.
-   - Usa el atributo name como clave; si no existe, usa id.
-=========================== */
 function recolectarCampos() {
   const datos = {};
   document.querySelectorAll('input, textarea, select').forEach(el => {
-    const clave = (el.name && el.name.trim()) ? el.name.trim()
-                 : (el.id && el.id.trim()) ? el.id.trim()
-                 : null;
+    const clave = el.name?.trim() || el.id?.trim();
     if (!clave) return;
-
-    // Soporte de checkbox y radio:
-    if (el.type === 'checkbox') {
-      datos[clave] = el.checked ? (el.value || 'Sí') : 'No';
-    } else if (el.type === 'radio') {
-      if (el.checked) datos[clave] = el.value;
-    } else {
-      datos[clave] = el.value;
-    }
+    datos[clave] = el.value;
   });
   return datos;
 }
 
-/* ===========================
-   UTILIDAD: BLOQUEAR BOTÓN
-=========================== */
-function bloquearBoton(btn, bloquear) {
-  if (!btn) return;
-  btn.disabled = !!bloquear;
-  if (bloquear) {
-    btn.dataset.originalText = btn.textContent;
-    btn.textContent = 'Guardando...';
-  } else {
-    btn.textContent = btn.dataset.originalText || btn.textContent;
-  }
-}
-
-/* ===========================
-   ENVÍO AL BACKEND (Apps Script)
-   *** Clave para evitar CORS/preflight:
-   - Content-Type: text/plain
-   - redirect: "follow"
-   - Sin headers extra
-=========================== */
 async function enviarDatos() {
-  const btn = document.querySelector('.btn-save'); // tu botón "Guardar y Enviar"
-  bloquearBoton(btn, true);
-
+  const datos = recolectarCampos();
   try {
-    const datos = recolectarCampos();
-
     const resp = await fetch(WEB_APP_URL, {
       method: 'POST',
-      redirect: 'follow',                           // evita problemas de redirección con GAS
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // petición "simple" sin preflight
-      body: JSON.stringify(datos)                   // JSON enviado como texto plano
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight
+      body: JSON.stringify(datos)
     });
-
     const r = await resp.json();
-    if (r && r.ok) {
-      // No modifico tu HTML; muestro el radicado en un alert para no tocar nada visual
+    if (r.ok) {
       alert(`¡Registro guardado!\nRadicado: ${r.radicado}`);
     } else {
-      alert('No se pudo guardar.\n' + (r && r.error ? r.error : 'Error desconocido.'));
+      alert('Error: ' + (r.error || 'desconocido'));
     }
   } catch (e) {
-    alert('Error de conexión. Verifica tu URL /exec y tu red.\n' + e);
-  } finally {
-    bloquearBoton(btn, false);
+    alert('Error de conexión: ' + e);
   }
 }
 
-/* ===========================
-   ENLACE AL BOTÓN EXISTENTE
-   - Mantengo tu bloque tal cual: escucho el click sobre .btn-save.
-   - No cambio atributos ni estructura del botón.
-=========================== */
-(function iniciar() {
-  const botonGuardar = document.querySelector('.btn-save');
-  if (!botonGuardar) {
-    console.warn('No se encontró un botón con clase .btn-save. Si tu botón tiene otra clase/ID, ajusta el selector.');
-    return;
-  }
-  botonGuardar.addEventListener('click', function(ev){
-    // Si tu botón está dentro de un <form>, prevenimos envío tradicional:
-    ev.preventDefault();
-    enviarDatos();
-  });
-})();
+document.querySelector('.btn-save').addEventListener('click', ev => {
+  ev.preventDefault();
+  enviarDatos();
+});
 </script>
 
 </body>
