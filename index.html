@@ -293,42 +293,67 @@ function consultarCaso(){
     alert('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
   }
 </script>
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzEuGScxu-lS16cgbb9ZUD7mHccbr3AgU0oqdH43cN3JHqMYXG5-mviHxitvT5-axZe/exec'; // reemplaza con la URL que copiaste
 
+/* ==== URL del Web App (Apps Script) ==== */
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzEuGScxu-lS16cgbb9ZUD7mHccbr3AgU0oqdH43cN3JHqMYXG5-mviHxitvT5-axZe/exec';
+
+/* ==== Toma todos los campos del formulario ==== */
 function recolectarCampos() {
   const datos = {};
   document.querySelectorAll('input, textarea, select').forEach(el => {
     const clave = el.name?.trim() || el.id?.trim();
     if (!clave) return;
-    datos[clave] = el.value;
+    if (el.type === 'checkbox') {
+      datos[clave] = el.checked ? (el.value || 'Sí') : 'No';
+    } else if (el.type === 'radio') {
+      if (el.checked) datos[clave] = el.value;
+    } else {
+      datos[clave] = el.value;
+    }
   });
   return datos;
 }
 
+/* ==== Envía los datos a Apps Script sin preflight ==== */
 async function enviarDatos() {
-  const datos = recolectarCampos();
+  const btn = document.querySelector('.btn-save');
+  if (btn) { btn.disabled = true; btn.dataset.originalText = btn.textContent; btn.textContent = 'Guardando...'; }
   try {
+    const datos = recolectarCampos();
+
+    // *** Clave para evitar CORS/preflight: Content-Type = text/plain y SIN cabeceras extra ***
     const resp = await fetch(WEB_APP_URL, {
       method: 'POST',
       redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(datos)
     });
+
     const r = await resp.json();
-    if (r.ok) {
+    if (r && r.ok) {
       alert(`¡Registro guardado!\nRadicado: ${r.radicado}`);
     } else {
-      alert('Error: ' + (r.error || 'desconocido'));
+      alert('No se pudo guardar.\n' + (r?.error || 'Error desconocido.'));
     }
   } catch (e) {
-    alert('Error de conexión: ' + e);
+    alert('Error de conexión.\n' + e);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || btn.textContent; }
   }
 }
 
-document.querySelector('.btn-save').addEventListener('click', ev => {
-  ev.preventDefault();
-  enviarDatos();
-});
+/* ==== Enganche al botón existente (.btn-save) ==== */
+(function iniciar(){
+  const botonGuardar = document.querySelector('.btn-save');
+  if (!botonGuardar) {
+    console.warn('No se encontró un botón con clase .btn-save. Ajusta el selector si tu botón tiene otra clase/ID.');
+    return;
+  }
+  botonGuardar.addEventListener('click', ev => {
+    ev.preventDefault();
+    enviarDatos();
+  });
+})();
 </script>
 
 </body>
