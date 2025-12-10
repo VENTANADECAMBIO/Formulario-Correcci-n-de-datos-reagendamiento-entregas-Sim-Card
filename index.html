@@ -293,5 +293,91 @@ function consultarCaso(){
     alert('No se encontró el formulario con id="miFormulario". Verifica el id en tu HTML.');
   }
 </script>
+/* ====== CONFIGURACIÓN ====== */
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzVV5iy8ZVeGj1BFyC7iG_rFaaqkYzTJ5XcNbcCiCKC2rs02KuoSuXfuvyQ3TKPZBvd/exec'; // <-- pega aquí tu URL /exec
+
+/* ====== UTILIDADES ====== */
+// Convierte todos los campos del formulario (input, textarea, select) a un objeto plano {nombre:valor}
+// Sin cambiar IDs ni nombres, toma 'name' si existe; si no, usa 'id' como clave.
+function recolectarCampos() {
+  const datos = {};
+  const campos = document.querySelectorAll('input, textarea, select');
+  campos.forEach(el => {
+    const clave = (el.name && el.name.trim()) ? el.name.trim()
+                 : (el.id && el.id.trim()) ? el.id.trim()
+                 : null;
+    if (clave) {
+      // Para checkbox y radio, guardar el valor checado
+      if (el.type === 'checkbox') {
+        datos[clave] = el.checked ? (el.value || 'Sí') : 'No';
+      } else if (el.type === 'radio') {
+        if (el.checked) datos[clave] = el.value;
+      } else {
+        datos[clave] = el.value;
+      }
+    }
+  });
+  return datos;
+}
+
+// Deshabilita temporalmente el botón para evitar doble envío
+function bloquearBoton(btn, bloqueado) {
+  if (!btn) return;
+  btn.disabled = !!bloqueado;
+  if (bloqueado) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Guardando...';
+  } else {
+    btn.textContent = btn.dataset.originalText || btn.textContent;
+  }
+}
+
+/* ====== ENVÍO AL BACKEND (Apps Script) ====== */
+async function enviarDatos() {
+  const botonGuardar = document.querySelector('.btn-save'); // tu botón existente
+  bloquearBoton(botonGuardar, true);
+
+  try {
+    const datos = recolectarCampos();
+
+    // Importante: para evitar CORS/preflight, enviamos JSON como 'text/plain' y usamos 'redirect: follow'
+    const resp = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(datos)
+    });
+
+    const r = await resp.json();
+    if (r && r.ok) {
+      // Mostramos el radicado sin tocar el HTML (alert). Si prefieres, puedes pintarlo en alguna etiqueta existente.
+      alert(`¡Registro guardado!\nRadicado: ${r.radicado}`);
+    } else {
+      const msg = (r && r.error) ? r.error : 'Error desconocido al guardar.';
+      alert('No se pudo guardar.\n' + msg);
+    }
+  } catch (err) {
+    alert('Error de conexión. Verifica tu internet o la URL del backend.\n' + err);
+  } finally {
+    bloquearBoton(botonGuardar, false);
+  }
+}
+
+/* ====== ENLACE AL BOTÓN EXISTENTE ====== */
+// NO cambiamos el HTML ni atributos del botón; solo le agregamos el "click" aquí.
+(function iniciar() {
+  const botonGuardar = document.querySelector('.btn-save');
+  if (!botonGuardar) {
+    console.warn('No se encontró un botón con clase .btn-save. Ajusta el selector si tu botón tiene otra clase.');
+    return;
+  }
+  botonGuardar.addEventListener('click', function(ev){
+    // Si tu botón está dentro de un <form>, prevenimos envío tradicional:
+    ev.preventDefault();
+    enviarDatos();
+  });
+})();
+</script>
+
 </body>
 </html>
