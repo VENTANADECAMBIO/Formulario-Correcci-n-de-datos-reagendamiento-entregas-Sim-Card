@@ -356,5 +356,49 @@ async function enviarDatos() {
 })();
 </script>
 
+<!-- Aquí se mostrará el radicado -->
+<div id="radicado" style="font-weight:bold; margin-top:12px;"></div>
+
+<script>
+async function enviarRadicado() {
+  const payload = {
+    token: 'CLARO2025', // si en el flujo validas el token
+    MIN: document.getElementById('MIN')?.value || '',
+    CEDULA: document.getElementById('CEDULA')?.value || '',
+    NombreCompleto: document.getElementById('NombreCompleto')?.value || '',
+    DireccionCompleta: document.getElementById('DireccionCompleta')?.value || '',
+    Barrio: document.getElementById('Barrio')?.value || '',
+    Ciudad: document.getElementById('Ciudad')?.value || '',
+    Departamento: document.getElementById('Departamento')?.value || '',
+    VentanaDeCambio: document.getElementById('VentanaDeCambio')?.value || '',
+    ICCID: document.getElementById('ICCID')?.value || '',
+    Observaciones: document.getElementById('Observaciones')?.value || '',
+    Fuente: document.getElementById('Fuente')?.value || 'GitHub Form',
+    FechaConsulta: new Date().toISOString(),
+    UsuarioRegistro: document.getElementById('UsuarioRegistro')?.value || ''
+  };
+
+  // ⛔ Reemplaza con la URL que acabas de copiar del desencadenador HTTP
+  const endpoint = 'https://TU-URL-DEL-FLUJO.../invoke';
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    const data = await res.json();
+    document.getElementById('radicado').innerText = `Radicado: ${data.radicado}`;
+  } catch (e) {
+    document.getElementById('radicado').innerText = 'Error al radicar, intenta nuevamente.';
+    console.error(e);
+  }
+}
+</script>
+
+<!-- Botón para enviar -->
+<button type="button" onclick="enviarRadicado()">Radicar</button>
+
 </body>
 </html>
